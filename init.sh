@@ -68,7 +68,6 @@ pull_chaos(){
 	mv /tmp/chaotic-main /tmp/`basename $CHAOS_DIR`
 	sudo mv --force /tmp/`basename $CHAOS_DIR` `dirname $CHAOS_DIR`
 	rm /tmp/chaos.zip
-	source $CHAOS_DIR/chaotic/*.sh
 }
 
 init_chaos() {
@@ -88,6 +87,8 @@ init_chaos() {
 
 	# Add user to the chaos group
 	sudo usermod -aG "$CHAOS_GROUP" "`whoami`"
+
+	source $CHAOS_DIR/chaotic/*.sh
 
 	# Pull helper scripts
 	setup_chaos_script_cron
@@ -122,9 +123,13 @@ run() {
 	tree $CHAOS_DIR
 	echo "[ENTER] STEP 2 - CHAOS"
 
+	source $CHAOS_DIR/chaotic/*.sh
+
 
 	# Security
-	chaos_harden
+	harden_sysctl_settings
+	install_scanning_tools
+	setup_syslog
 
 	echo "[ENTER] STEP 3 - sysctl"
 

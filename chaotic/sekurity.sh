@@ -1,6 +1,6 @@
 #!/bin/bash
 
-install_scanning_tools() {
+install_scanning_tools(){
     # Install some sekurity
     sudo apt install -y \
         rkhunter \
@@ -13,7 +13,7 @@ install_scanning_tools() {
 }
 
 ### SYSLOG ###
-setup_syslog() {
+setup_syslog(){
   sudo apt install -y syslog-ng 
 
   # Configure syslog-ng to forward logs to Splunk
@@ -26,14 +26,8 @@ setup_syslog() {
   sudo systemctl enable syslog-ng
 }
 
-harden_sysctl_settings() {
+harden_sysctl_settings(){
 	# harden sysctl settings
   sudo cp $CHAOS_DIR/etc/sysctl.d/*.conf /etc/sysctl.d/
 	sudo sysctl --system
-}
-
-chaos_harden() {
-  harden_sysctl_settings
-	install_scanning_tools
-	setup_syslog
 }
