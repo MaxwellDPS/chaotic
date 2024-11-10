@@ -96,6 +96,7 @@ init_chaos() {
 	# Setup HEC logger
 	setup_hec_script
 
+
 	# Set permissions on the chaos mgmt dirs
 	sudo chown -R root:$CHAOS_GROUP $CHAOS_DIR
 	sudo chmod -R 654 $CHAOS_DIR/{x509,scripts}
@@ -105,6 +106,7 @@ init_chaos() {
 	echo "export PATH=$CHAOS_DIR/scripts:\$PATH" >> ~/.bashrc
 
 	# Setup CAs
+	setup_x509_script
 	sudo $CHAOS_DIR/scripts/chaos-x509.sh
 }
 

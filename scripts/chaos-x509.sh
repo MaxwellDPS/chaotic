@@ -3,11 +3,10 @@
 ##### Download CA certs for CHAOS #######
 
 # Directory to store downloaded certificates
-local cert_dir="/usr/local/share/ca-certificates/chaos"
-mkdir -p "$cert_dir"
+CERT_DIR="/usr/local/share/ca-certificates/chaos"
+mkdir -p $CERT_DIR
 
-
-CERT_INFO_FILE=/opt/chaos/x509/.spectr.yaml
+CERT_INFO_FILE=CHAOS_DIR/x509/.spectr.yaml
 
 # Checks for CA meta file
 if [[ ! -f "$CERT_INFO_FILE" ]]; then
@@ -21,7 +20,7 @@ urls=$(yq '.active[].url' "$CERT_INFO_FILE")
 for url in $urls; do
   echo "Downloading CA certificate from $url"
   cert_name=$(basename "$url")
-  cert_path="$cert_dir/$cert_name"
+  cert_path="$CERT_DIR/$cert_name"
 
   # Download the certificate
   if curl -fsSL "$url" -o "$cert_path"; then
