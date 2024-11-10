@@ -3,7 +3,7 @@
 setup_k3s_audit(){
 	sudo mkdir -p -m 700 /var/lib/rancher/k3s/server/logs
 
-	sudo cat <<-EOF > /var/lib/rancher/k3s/server/audit.yaml
+	cat <<-EOF | sudo tee /var/lib/rancher/k3s/server/audit.yaml
 	apiVersion: audit.k8s.io/v1
 	kind: Policy
 	rules:
@@ -18,7 +18,7 @@ setup_k3s_config(){
 
 	sudo mkdir -p -m 700 /etc/rancher/k3s/
 
-	sudo cat <<-EOF > /etc/rancher/k3s/config.yaml
+	cat <<-EOF | sudo tee /etc/rancher/k3s/config.yaml
 	write-kubeconfig: $CHAOS_DIR/kubeconfig.yaml
 	write-kubeconfig-mode: 660
 	write-kubeconfig-group: $CHAOS_GROUP

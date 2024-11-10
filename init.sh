@@ -3,9 +3,6 @@
 # Exit on any error
 set -e
 
-set -o xtrace
-
-
 REPO_URL=https://github.com/MaxwellDPS/chaotic/archive/refs/heads/main.zip
 
 # CHAOS SETTINGS
@@ -70,6 +67,18 @@ pull_chaos(){
 	rm /tmp/chaos.zip
 }
 
+setup_hec_script(){
+    ### SPLUNK HEC HELPER ###
+    sudo sed -i -e "s/SPLUNK_HOST/$SPLUNK_HOST/g"                   $CHAOS_DIR/scripts/log_hec.sh
+    sudo sed -i -e "s/SPLUNK_TOKEN/$SPLUNK_TOKEN/g"                 $CHAOS_DIR/scripts/log_hec.sh
+    sudo sed -i -e "s/SPLUNK_FALCO_INDEX/$SPLUNK_FALCO_INDEX/g"     $CHAOS_DIR/scripts/log_hec.sh
+}
+
+setup_x509_script(){
+    ### SPLUNK HEC HELPER ###
+    sudo sed -i -e "s;CHAOS_DIR;$CHAOS_DIR;g"                       $CHAOS_DIR/scripts/chaos-x509.sh
+}
+
 init_chaos() {
 	# Setup chaos mgmt dirs
 	# Check if directory exists
@@ -88,10 +97,12 @@ init_chaos() {
 	# Add user to the chaos group
 	sudo usermod -aG "$CHAOS_GROUP" "`whoami`"
 
-	source $CHAOS_DIR/chaotic/chaos.sh
-
-	# Pull helper scripts
-	setup_chaos_script_cron
+	# Setup Cron
+	sudo crontab -r || true
+	(	
+		echo "0 * * * * $CHAOS_DIR/scripts/cf-ip-update.sh | logger -t cf-ip-update";
+		echo "0 * * * * $CHAOS_DIR/scripts/chaos-x509.sh   | logger -t chaos-x509"
+	) | sudo crontab -
 
 	# Setup HEC logger
 	setup_hec_script
@@ -110,31 +121,24 @@ init_chaos() {
 }
 
 run() {
-	# ubuntu
-	update_system_packages
+	# update_system_packages
 
-	echo "[ENTER] STEP 1"
+	# echo "[ENTER] STEP 1"
 	
-	# chaos
-	init_chaos
-	sudo crontab -l
-	exit
-	echo "[ENTER] STEP 2 - CHAOS"
+	# # chaos
+	# init_chaos
+	# echo "[ENTER] STEP 2 - CHAOS"
 
-	# Security
-	source $CHAOS_DIR/chaotic/sekurity.sh
-	sysctl_settings
-	install_scanning_tools
-	setup_syslog
+	# # Security
+	# source $CHAOS_DIR/chaotic/sekurity.sh
+	# sysctl_settings
+	# install_scanning_tools
+	# setup_syslog
+	# echo "[ENTER] STEP 3 - sysctl"
 
-	sudo crontab -l
-	echo "[ENTER] STEP 3 - sysctl"
-
-	# tailscale
-	setup_tailscale
-
-	echo "[ENTER] STEP 4 - Tailscale"
-	exit
+	# # tailscale
+	# setup_tailscale
+	# echo "[ENTER] STEP 4 - Tailscale"
 
 	# kube
 	source $CHAOS_DIR/chaotic/k3s.sh
@@ -142,6 +146,8 @@ run() {
 
 	sudo systemctl status k3s
 	echo "[ENTER] STEP 4 - k3s"
+
+	exit
 
 
 	# Falco
