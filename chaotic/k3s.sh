@@ -26,7 +26,6 @@ setup_k3s_config(){
 		- servicelb
 		- traefik
 	kube-apiserver-arg:
-		- "enable-admission-plugins=NodeRestriction,EventRateLimit"
 		- 'audit-log-path=/var/lib/rancher/k3s/server/logs/audit.log'
 		- 'audit-policy-file=/var/lib/rancher/k3s/server/audit.yaml'
 		- 'audit-log-maxage=30'
