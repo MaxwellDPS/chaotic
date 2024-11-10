@@ -89,9 +89,6 @@ init_chaos() {
 	# Add user to the chaos group
 	sudo usermod -aG "$CHAOS_GROUP" "`whoami`"
 
-	# Activate the chaos group
-	sudo newgrp $CHAOS_GROUP
-
 	# Pull helper scripts
 	setup_chaos_script_cron
 	sudo crontab -l
@@ -99,19 +96,16 @@ init_chaos() {
 	# Setup HEC logger
 	setup_hec_script
 
-	cat $CHAOS_DIR/
-
 	# Set permissions on the chaos mgmt dirs
 	sudo chown -R root:$CHAOS_GROUP $CHAOS_DIR
-	sudo chmod -R 660 $CHAOS_DIR/{x509,scripts}
-	sudo chmod 664 $CHAOS_DIR/config
+	sudo chmod -R 654 $CHAOS_DIR/{x509,scripts}
 
 	# Add scripts dir to the path
 	export PATH="$CHAOS_DIR/scripts:$PATH"
 	echo "export PATH=$CHAOS_DIR/scripts:\$PATH" >> ~/.bashrc
 
 	# Setup CAs
-	sudo chaos-x509.sh
+	sudo $CHAOS_DIR/scripts/chaos-x509.sh
 }
 
 run() {
