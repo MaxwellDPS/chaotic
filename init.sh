@@ -126,7 +126,7 @@ run() {
 	# echo "[ENTER] STEP 1"
 	
 	# # chaos
-	# init_chaos
+	init_chaos
 	# echo "[ENTER] STEP 2 - CHAOS"
 
 	# # Security

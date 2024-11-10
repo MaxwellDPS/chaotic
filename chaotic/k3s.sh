@@ -48,7 +48,7 @@ setup_k3s_config(){
 	secrets-encryption: true
 	cluster-domain: $CHAOS_DOMAIN
 	cluster-cidr: $POD_CIDR
-  service-cidr: $SVC_CIDR
+	service-cidr: $SVC_CIDR
 	cluster-init: true
 	selinux: true
 	EOF
