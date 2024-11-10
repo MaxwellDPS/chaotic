@@ -63,7 +63,7 @@ pull_chaos(){
 	curl -sSL -o /tmp/chaos.zip $REPO_URL
 	sudo mkdir -p $CHAOS_DIR
 	unzip /tmp/chaos.zip -d /tmp/
-	sudo mv /tmp/chaos-main $CHAOS_DIR
+	sudo mv /tmp/chaotic-main $CHAOS_DIR
 	rm /tmp/chaos.zip
 	source $CHAOS_DIR/chaotic/*.sh
 }
