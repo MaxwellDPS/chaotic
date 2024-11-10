@@ -32,7 +32,7 @@ harden_sysctl_settings() {
 	sudo sysctl --system
 }
 
-chaos_harden(){
+chaos_harden() {
   harden_sysctl_settings
 	install_scanning_tools
 	setup_syslog
