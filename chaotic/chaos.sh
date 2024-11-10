@@ -19,5 +19,5 @@ setup_hec_script(){
 
 setup_x509_script(){
     ### SPLUNK HEC HELPER ###
-    sudo sed -i -e "s/CHAOS_DIR/$CHAOS_DIR/g"                       $CHAOS_DIR/scripts/chaos-x509.sh
+    sudo sed -i -e "s;CHAOS_DIR;$CHAOS_DIR;g"                       $CHAOS_DIR/scripts/chaos-x509.sh
 }
