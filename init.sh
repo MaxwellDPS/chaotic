@@ -3,6 +3,9 @@
 # Exit on any error
 set -e
 
+set -o xtrace
+
+
 REPO_URL=https://github.com/MaxwellDPS/chaotic/archive/refs/heads/main.zip
 
 # CHAOS SETTINGS
@@ -58,19 +61,23 @@ setup_tailscale(){
 		--login-server=$TAILSCALE_SERVER
 }
 
-
 pull_chaos(){
 	curl -sSL -o /tmp/chaos.zip $REPO_URL
 	sudo mkdir -p $CHAOS_DIR
-	unzip -u /tmp/chaos.zip -d /tmp/
-	sudo mv /tmp/chaotic-main $CHAOS_DIR
+	unzip -ou /tmp/chaos.zip -d /tmp/
+	mv /tmp/chaotic-main /tmp/`basename $CHAOS_DIR`
+	sudo mv --force /tmp/`basename $CHAOS_DIR` `dirname $CHAOS_DIR`
 	rm /tmp/chaos.zip
 	source $CHAOS_DIR/chaotic/*.sh
 }
 
 init_chaos() {
 	# Setup chaos mgmt dirs
-	sudo mkdir -p $CHAOS_DIR
+	# Check if directory exists
+	if [ -d "$CHAOS_DIR" ]; then
+		sudo rm -rf "$CHAOS_DIR"
+	fi
+
 	pull_chaos
 
 	# Create the group if it doesn't exist
@@ -81,8 +88,9 @@ init_chaos() {
 
 	# Add user to the chaos group
 	sudo usermod -aG "$CHAOS_GROUP" "`whoami`"
+
 	# Activate the chaos group
-	newgrp $CHAOS_GROUP
+	sudo newgrp $CHAOS_GROUP
 
 	# Pull helper scripts
 	setup_chaos_script_cron
@@ -111,33 +119,29 @@ run() {
 	update_system_packages
 
 	echo "[ENTER] STEP 1"
-	sleep 5
-
+	
 	# chaos
 	init_chaos
 
 	tree $CHAOS_DIR
-	echo "[ENTER] STEP 2 - CHAOS"
-	sleep 5
+	echo "[ENTER] STEP 2 - CHAOS" Y
+
 
 	# Security
 	chaos_harden
 
 	echo "[ENTER] STEP 3 - sysctl"
-	sleep 5
 
 	# tailscale
 	setup_tailscale
 
 	echo "[ENTER] STEP 4 - Tailscale"
-	sleep 5
 
 	# kube
 	install_k3s
 
 	sudo systemctl status k3s
 	echo "[ENTER] STEP 4 - k3s"
-	sleep 5
 
 
 	# Falco
@@ -145,7 +149,6 @@ run() {
 
 	sudo systemctl list-units | grep falco
 	echo "[ENTER] STEP 4 - falco"
-	sleep 5
 
 
 	# UFW

@@ -13,6 +13,6 @@ setup_chaos_script_cron(){
 setup_hec_script(){
     ### SPLUNK HEC HELPER ###
     sudo sed -i -e "s/SPLUNK_HOST/$SPLUNK_HOST/g"                   $CHAOS_DIR/scripts/log_hec.sh
-    sudp sed -i -e "s/SPLUNK_TOKEN/$SPLUNK_TOKEN/g"                 $CHAOS_DIR/scripts/log_hec.sh
+    sudo sed -i -e "s/SPLUNK_TOKEN/$SPLUNK_TOKEN/g"                 $CHAOS_DIR/scripts/log_hec.sh
     sudo sed -i -e "s/SPLUNK_FALCO_INDEX/$SPLUNK_FALCO_INDEX/g"     $CHAOS_DIR/scripts/log_hec.sh
 }
