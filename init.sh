@@ -27,14 +27,13 @@ CERT_INFO_FILE_URL=${CERT_INFO_FILE_URL:-"$REPO_URL.spectr.yaml"}
 CERT_INFO_FILE=$CHAOS_DIR/certs.yaml
 
 # Extra packages to install
-CHAOS_APT_EXTRA="jq yq curl wget nano htop uuid net-tools dns-utils unzip gnupg tree cron"
+CHAOS_APT_EXTRA="jq yq curl wget nano htop uuid net-tools dnsutils unzip gnupg tree cron"
 
 # Minikube settings
 POD_CIDR=${POD_CIDR:-"192.168.20.0/22"}
 SVC_CIDR=${SVC_CIDR:-"192.168.26.0/22"}
 KUBERNETES_VERSION=${KUBERNETES_VERSION:-"stable"}
 
-source $CHAOS_DIR/chaotic/*.sh
 
 update_system_packages() {
 	sudo apt update
@@ -48,7 +47,7 @@ update_system_packages() {
 		$CHAOS_APT_EXTRA
 
 	# Enable automatic updates yo
-	sudo dpkg-reconfigure --priority=low unattended-upgrades
+	sudo dpkg-reconfigure --priority=low unattended-upgrades --frontend=noninteractive
 }
 
 setup_tailscale(){
@@ -61,15 +60,17 @@ setup_tailscale(){
 
 
 pull_chaos(){
-	curl -sSL -O /tmp/choas.zip $REPO_URL
+	curl -sSL -o /tmp/chaos.zip $REPO_URL
 	sudo mkdir -p $CHAOS_DIR
-	sudo unzip /tmp/choas.zip -d $CHAOS_DIR
+	unzip /tmp/chaos.zip -d /tmp/
+	sudo mv /tmp/chaos-main $CHAOS_DIR
 	rm /tmp/chaos.zip
+	source $CHAOS_DIR/chaotic/*.sh
 }
 
 init_chaos() {
 	# Setup chaos mgmt dirs
-	sudo mkdir -P $CHAOS_DIR
+	sudo mkdir -p $CHAOS_DIR
 	pull_chaos
 
 	# Create the group if it doesn't exist
@@ -85,9 +86,12 @@ init_chaos() {
 
 	# Pull helper scripts
 	setup_chaos_script_cron
+	sudo crontab -l
 
 	# Setup HEC logger
 	setup_hec_script
+
+	cat $CHAOS_DIR/
 
 	# Set permissions on the chaos mgmt dirs
 	sudo chown -R root:$CHAOS_GROUP $CHAOS_DIR
