@@ -27,18 +27,7 @@ CERT_INFO_FILE_URL=${CERT_INFO_FILE_URL:-"$REPO_URL.spectr.yaml"}
 CERT_INFO_FILE=$CHAOS_DIR/certs.yaml
 
 # Extra packages to install
-CHAOS_APT_EXTRA=jq \
-	yq \
-	curl \
-	wget \
-	nano \
-	htop \
-	uuid \
-	net-tools \
-	dns-utils \
-	unzip \
-	gnupg \
-	tree
+CHAOS_APT_EXTRA="jq yq curl wget nano htop uuid net-tools dns-utils unzip gnupg tree cron"
 
 # Minikube settings
 POD_CIDR=${POD_CIDR:-"192.168.20.0/22"}
