@@ -120,7 +120,7 @@ run() {
 	init_chaos
 
 	tree $CHAOS_DIR
-	echo "[ENTER] STEP 2 - CHAOS" Y
+	echo "[ENTER] STEP 2 - CHAOS"
 
 
 	# Security
