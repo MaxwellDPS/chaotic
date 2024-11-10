@@ -1,0 +1,22 @@
+active:
+  - name: CHAOS EC-1X
+    id: 24439436C85B5602
+    type: root
+    iss: null
+    url: https://raw.githubusercontent.com/MaxwellDPS/chaotic/refs/heads/main/EC-1X_root.crt
+    revoked: false
+    canary: blue
+  - name: CHAOTIC WAYS
+    id: 486A2A2403B4291D
+    type: intermediary
+    iss: 24439436C85B5602
+    url: https://raw.githubusercontent.com/MaxwellDPS/chaotic/refs/heads/main/chaotic_ways_intermediary.crt
+    revoked: false
+    canary: blue
+  - name: CHAOTIC NOwHERE
+    id: 25D61103C25041AB
+    type: intermediary
+    iss: 24439436C85B5602
+    url: https://raw.githubusercontent.com/MaxwellDPS/chaotic/refs/heads/main/chaotic_nowhere_intermediary.crt
+    revoked: false
+    canary: jasmine
