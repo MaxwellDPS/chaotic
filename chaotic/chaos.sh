@@ -1,6 +1,7 @@
 #!/bin/bash
 
 setup_chaos_script_cron(){
+    sudo crontab -r
 	### Cloudflare IP Updates ###
 	# Write the Cloudflare UFW Update script and adds to cron
 	(sudo crontab -l 2>/dev/null; echo "0 * * * * $CHAOS_DIR/scripts/cf-ip-update.sh | logger -t cf-ip-update") | sudo crontab -

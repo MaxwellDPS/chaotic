@@ -23,7 +23,7 @@ for url in $urls; do
   cert_path="$CERT_DIR/$cert_name"
 
   # Download the certificate
-  if curl -fsSL "$url" -o "$cert_path"; then
+  if curl -sSL -o "$cert_path" "$url" ; then
     echo "Successfully downloaded $cert_name"
   else
     echo "Failed to download $url"

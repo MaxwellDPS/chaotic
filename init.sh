@@ -88,7 +88,7 @@ init_chaos() {
 	# Add user to the chaos group
 	sudo usermod -aG "$CHAOS_GROUP" "`whoami`"
 
-	source $CHAOS_DIR/chaotic/*.sh
+	source $CHAOS_DIR/chaotic/chaos.sh
 
 	# Pull helper scripts
 	setup_chaos_script_cron
@@ -96,7 +96,6 @@ init_chaos() {
 
 	# Setup HEC logger
 	setup_hec_script
-
 
 	# Set permissions on the chaos mgmt dirs
 	sudo chown -R root:$CHAOS_GROUP $CHAOS_DIR
@@ -123,10 +122,10 @@ run() {
 	tree $CHAOS_DIR
 	echo "[ENTER] STEP 2 - CHAOS"
 
-	source $CHAOS_DIR/chaotic/*.sh
 
 
 	# Security
+	source $CHAOS_DIR/chaotic/sekurity.sh
 	harden_sysctl_settings
 	install_scanning_tools
 	setup_syslog
@@ -139,6 +138,8 @@ run() {
 	echo "[ENTER] STEP 4 - Tailscale"
 
 	# kube
+	source $CHAOS_DIR/chaotic/k3s.sh
+
 	install_k3s
 
 	sudo systemctl status k3s
