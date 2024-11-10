@@ -110,44 +110,50 @@ run() {
 	# ubuntu
 	update_system_packages
 
-	read -p "[ENTER] STEP 1"
+	echo "[ENTER] STEP 1"
+	sleep 5
 
 	# chaos
 	init_chaos
 
 	tree $CHAOS_DIR
-	read -p "[ENTER] STEP 2 - CHAOS"
+	echo "[ENTER] STEP 2 - CHAOS"
+	sleep 5
 
 	# Security
 	chaos_harden
 
-	read -p "[ENTER] STEP 3 - sysctl"
+	echo "[ENTER] STEP 3 - sysctl"
+	sleep 5
 
 	# tailscale
 	setup_tailscale
 
-	read -p "[ENTER] STEP 4 - Tailscale"
+	echo "[ENTER] STEP 4 - Tailscale"
+	sleep 5
 
 	# kube
 	install_k3s
 
 	sudo systemctl status k3s
-	read -p "[ENTER] STEP 4 - k3s"
+	echo "[ENTER] STEP 4 - k3s"
+	sleep 5
 
 
 	# Falco
 	install_falco
 
 	sudo systemctl list-units | grep falco
-	read -p "[ENTER] STEP 4 - falco"
+	echo "[ENTER] STEP 4 - falco"
+	sleep 5
 
 
 	# UFW
 	enable_ufw
 
 	dmesg
-	read -p "[ENTER] STEP 4 - ufw"
-
+	echo "[ENTER] STEP 4 - ufw"
+	sleep 5
 
 	get_k3s_kubeconfig
 }
