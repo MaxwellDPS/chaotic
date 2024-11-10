@@ -30,7 +30,7 @@ CERT_INFO_FILE_URL=${CERT_INFO_FILE_URL:-"$REPO_URL.spectr.yaml"}
 CERT_INFO_FILE=$CHAOS_DIR/certs.yaml
 
 # Extra packages to install
-CHAOS_APT_EXTRA="jq yq curl wget nano htop uuid net-tools dnsutils unzip gnupg tree cron"
+CHAOS_APT_EXTRA="ufw jq yq curl wget nano htop uuid net-tools dnsutils unzip gnupg tree cron"
 
 # Minikube settings
 POD_CIDR=${POD_CIDR:-"192.168.20.0/22"}
@@ -92,14 +92,13 @@ init_chaos() {
 
 	# Pull helper scripts
 	setup_chaos_script_cron
-	sudo crontab -l
 
 	# Setup HEC logger
 	setup_hec_script
 
 	# Set permissions on the chaos mgmt dirs
 	sudo chown -R root:$CHAOS_GROUP $CHAOS_DIR
-	sudo chmod -R 654 $CHAOS_DIR/{x509,scripts}
+	sudo chmod -R 755 $CHAOS_DIR/{x509,scripts}
 
 	# Add scripts dir to the path
 	export PATH="$CHAOS_DIR/scripts:$PATH"
@@ -118,28 +117,28 @@ run() {
 	
 	# chaos
 	init_chaos
-
-	tree $CHAOS_DIR
 	echo "[ENTER] STEP 2 - CHAOS"
 
+	
 
 
 	# Security
 	source $CHAOS_DIR/chaotic/sekurity.sh
-	harden_sysctl_settings
+	sysctl_settings
 	install_scanning_tools
 	setup_syslog
 
+	sudo crontab -l
 	echo "[ENTER] STEP 3 - sysctl"
 
 	# tailscale
 	setup_tailscale
 
 	echo "[ENTER] STEP 4 - Tailscale"
+	exit
 
 	# kube
 	source $CHAOS_DIR/chaotic/k3s.sh
-
 	install_k3s
 
 	sudo systemctl status k3s
