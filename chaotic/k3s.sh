@@ -60,6 +60,7 @@ install_k3s(){
 	setup_k3s_config
 
 	sudo curl -sL https://get.k3s.io/  -o $CHAOS_DIR/scripts/install.sh
+	sudo chmod +x $CHAOS_DIR/scripts/install.sh
 	sudo $CHAOS_DIR/scripts/install.sh server --config /etc/rancher/k3s/config.yaml
 
 	sudo chmod -R 600 /var/lib/rancher/k3s/server/tls/*.crt
