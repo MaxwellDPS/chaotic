@@ -15,7 +15,7 @@ if [[ ! -f "$CERT_INFO_FILE" ]]; then
 fi
 
 # Extract URLs from the YAML file using yq
-urls=$(yq '.active[].url' "$CERT_INFO_FILE")
+urls=$(yq -r '.active[].url' "$CERT_INFO_FILE")
 
 for url in $urls; do
   echo "Downloading CA certificate from $url"
@@ -23,7 +23,7 @@ for url in $urls; do
   cert_path="$CERT_DIR/$cert_name"
 
   # Download the certificate
-  if curl -sSL -o "$cert_path" "$url" ; then
+  if curl -sSL -o "$cert_path" $url; then
     echo "Successfully downloaded $cert_name"
   else
     echo "Failed to download $url"
