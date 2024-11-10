@@ -6,6 +6,9 @@
 local cert_dir="/usr/local/share/ca-certificates/chaos"
 mkdir -p "$cert_dir"
 
+
+CERT_INFO_FILE=$CHAOS_DIR/x509/.spectr.yaml
+
 # Checks for CA meta file
 if [[ ! -f "$CERT_INFO_FILE" ]]; then
   echo "YAML file not found: $CERT_INFO_FILE"

@@ -24,6 +24,12 @@ config_ufw_defauts() {
 	### SYSLOG ###
 	# Add firewall rule for syslog
 	sudo ufw allow out to "$SPLUNK_HOST" port "$SPLUNK_PORT" proto tcp comment "Splunk syslog"
+
+    ### k3s ###
+    ufw allow 6443/tcp #apiserver
+    ufw allow from $POD_CIDR to any #pods
+    ufw allow from $SVC_CIDR to any #services
+
 }
 
 setup_ufw_for_docker() {

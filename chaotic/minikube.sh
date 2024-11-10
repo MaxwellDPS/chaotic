@@ -2,7 +2,7 @@
 
 get_kubeconfig(){
 	# Get kubeconfig with tailscale IP
-	cat ~/.kube/config | sed  -e "s/127.0.0.1/$TAILSCALE_IP/g"
+	cat ~/.kube/config | sed  -e "s/127.0.0.1/$HOSTNAME.$CHAOS_DOMAIN/g"
 }
 
 # Install hardned minikube

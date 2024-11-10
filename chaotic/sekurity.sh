@@ -17,10 +17,9 @@ setup_syslog() {
   sudo apt install -y syslog-ng 
 
   # Configure syslog-ng to forward logs to Splunk
-  curl -FsSL $REPO_URL/etc/syslog-ng/conf.d/splunk.conf |\
-    sed -e "s/SPLUNK_HOST/$SPLUNK_HOST/g" |\
-    sed -e "s/SPLUNK_PORT/$SPLUNK_PORT/g" |\
-    sudo tee /etc/syslog-ng/conf.d/splunk.conf
+  sudo cp $CHAOS_DIR/etc/syslog-ng/conf.d/splunk.conf /etc/syslog-ng/conf.d/
+  sudo sed -e "s/SPLUNK_HOST/$SPLUNK_HOST/g"  /etc/syslog-ng/conf.d/splunk.conf
+  sudo sed -e "s/SPLUNK_PORT/$SPLUNK_PORT/g"  /etc/syslog-ng/conf.d/splunk.conf
 
   # Restart syslog-ng to apply changes
   sudo systemctl restart syslog-ng
@@ -29,6 +28,12 @@ setup_syslog() {
 
 harden_sysctl_settings() {
 	# harden sysctl settings
-  sudo cp `pwd`/etc/sysctl.d/*.conf /etc/sysctl.d/
+  sudo cp $CHAOS_DIR/etc/sysctl.d/*.conf /etc/sysctl.d/
 	sudo sysctl --system
+}
+
+chaos_harden(){
+  harden_sysctl_settings
+	install_scanning_tools
+	setup_syslog
 }

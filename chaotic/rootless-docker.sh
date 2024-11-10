@@ -21,9 +21,11 @@ install_rootless_docker() {
 	export PATH=/home/$(whoami)/bin:$PATH
 	echo 'export PATH=/home/$(whoami)/bin:$PATH' >> ~/.bashrc
 
+	# Add self to docker group now
 	sudo usermod -aG docker `whoami`
 	newgrp docker
 
+	# Ensure rootless install for app armor
 	dockerd-rootless-setuptool.sh install
 	docker context use rootless
 
