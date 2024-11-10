@@ -140,24 +140,23 @@ run() {
 	# setup_tailscale
 	# echo "[ENTER] STEP 4 - Tailscale"
 
-	# kube
-	source $CHAOS_DIR/chaotic/k3s.sh
-	install_k3s
-
-	sudo systemctl status k3s
-	echo "[ENTER] STEP 4 - k3s"
-
-	exit
-
+	# # kube
+	# source $CHAOS_DIR/chaotic/k3s.sh
+	# install_k3s
+	# sudo systemctl status k3s
+	# echo "[ENTER] STEP 4 - k3s"
 
 	# Falco
+	source $CHAOS_DIR/chaotic/falco.sh
 	install_falco
 
 	sudo systemctl list-units | grep falco
 	echo "[ENTER] STEP 4 - falco"
 
+	exit
 
 	# UFW
+	source $CHAOS_DIR/chaotic/ufw.sh
 	enable_ufw
 
 	dmesg
@@ -165,6 +164,7 @@ run() {
 	sleep 5
 
 	get_k3s_kubeconfig
+	sudo kubectl get no
 }
 
 run
