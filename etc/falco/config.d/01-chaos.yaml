@@ -1,0 +1,27 @@
+load_plugins: [k8saudit,json]
+
+rule_matching: all
+log_stderr: true
+log_syslog: true
+
+json_output: true
+json_include_output_property: true
+json_include_message_property: 
+
+engine:
+  kind: modern_ebpf
+
+stdout_output:
+  enabled: true
+
+syslog_output:
+  enabled: true
+
+file_output:
+  enabled: false
+  keep_alive: false
+  filename: /var/log/falco/falco.log
+
+program_output:
+  enabled: true
+  program:  CHAOS_DIR/scripts/log_hec.sh
