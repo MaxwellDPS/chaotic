@@ -62,7 +62,7 @@ setup_tailscale(){
 pull_chaos(){
 	curl -sSL -o /tmp/chaos.zip $REPO_URL
 	sudo mkdir -p $CHAOS_DIR
-	unzip /tmp/chaos.zip -d /tmp/
+	unzip -u /tmp/chaos.zip -d /tmp/
 	sudo mv /tmp/chaotic-main $CHAOS_DIR
 	rm /tmp/chaos.zip
 	source $CHAOS_DIR/chaotic/*.sh
