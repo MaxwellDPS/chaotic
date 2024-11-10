@@ -98,7 +98,7 @@ init_chaos() {
 
 	# Set permissions on the chaos mgmt dirs
 	sudo chown -R root:$CHAOS_GROUP $CHAOS_DIR
-	sudo chmod -R 755 $CHAOS_DIR/{x509,scripts}
+	sudo chmod -R 655 $CHAOS_DIR/{x509,scripts}
 
 	# Add scripts dir to the path
 	export PATH="$CHAOS_DIR/scripts:$PATH"
@@ -118,9 +118,6 @@ run() {
 	# chaos
 	init_chaos
 	echo "[ENTER] STEP 2 - CHAOS"
-
-	
-
 
 	# Security
 	source $CHAOS_DIR/chaotic/sekurity.sh

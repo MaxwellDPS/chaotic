@@ -17,7 +17,8 @@ setup_syslog(){
   sudo apt install -y syslog-ng 
 
   # Configure syslog-ng to forward logs to Splunk
-  sudo cp $CHAOS_DIR/etc/syslog-ng/conf.d/splunk.conf /etc/syslog-ng/conf.d/
+  sudo rm -f /etc/syslog-ng/conf.d/splunk.conf || true
+  sudo cp $CHAOS_DIR/etc/syslog-ng/conf.d/splunk.conf /etc/syslog-ng/conf.d/splunk.conf
   sudo sed -i -e "s/SPLUNK_HOST/$SPLUNK_HOST/g"  /etc/syslog-ng/conf.d/splunk.conf
   sudo sed -i -e "s/SPLUNK_PORT/$SPLUNK_PORT/g"  /etc/syslog-ng/conf.d/splunk.conf
 
