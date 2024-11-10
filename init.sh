@@ -22,7 +22,7 @@ SPLUNK_TOKEN=${SPLUNK_TOKEN:-"POTATO"}
 SPLUNK_FALCO_INDEX=${SPLUNK_FALCO_INDEX:-"falco"}
 
 # Tailscale settings 
-TAILSCALE_AUTH_KEY=${TAILSCALE_AUTH_KEY:-""}
+TAILSCALE_AUTH_KEY=${TAILSCALE_AUTH_KEY:-$1}
 TAILSCALE_SERVER=${TAILSCALE_SERVER:-"https://controlplane.tailscale.com"}
 
 # CA Certs
@@ -117,6 +117,8 @@ run() {
 	
 	# chaos
 	init_chaos
+	sudo crontab -l
+	exit
 	echo "[ENTER] STEP 2 - CHAOS"
 
 	# Security
