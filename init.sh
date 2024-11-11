@@ -122,29 +122,22 @@ init_chaos() {
 
 run() {
 	update_system_packages
-
-	# echo "[ENTER] STEP 1"
 	
-	# # chaos
+	# chaos
 	init_chaos
-	echo "[ENTER] STEP 2 - CHAOS"
 
 	# Security
 	source $CHAOS_DIR/chaotic/sekurity.sh
 	sysctl_settings
 	install_scanning_tools
 	setup_syslog
-	echo "[ENTER] STEP 3 - sysctl"
 
 	# tailscale
 	setup_tailscale
-	echo "[ENTER] STEP 4 - Tailscale"
 
-	# # kube
+	# kube
 	source $CHAOS_DIR/chaotic/k3s.sh
 	install_k3s
-	sudo systemctl status k3s
-	echo "[ENTER] STEP 4 - k3s"
 
 	source $CHAOS_DIR/chaotic/gvisor.sh
 	install_gvisor
@@ -153,18 +146,13 @@ run() {
 	source $CHAOS_DIR/chaotic/falco.sh
 	install_falco
 
-	sudo systemctl list-units | grep falco
-	echo "[ENTER] STEP 4 - falco"
-
-
 	# UFW
 	source $CHAOS_DIR/chaotic/ufw.sh
 	enable_ufw
 
-
 	get_k3s_kubeconfig
 	sudo kubectl get no
-	sudo kubectl get runtimeclass
+
 }
 
 run
