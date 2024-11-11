@@ -19,9 +19,6 @@ setup_k3s_config(){
 	sudo mkdir -p -m 700 /etc/rancher/k3s/
 
 	cat <<-EOF | sudo tee /etc/rancher/k3s/config.yaml
-	write-kubeconfig: $CHAOS_DIR/kubeconfig.yaml
-	write-kubeconfig-mode: 660
-	write-kubeconfig-group: $CHAOS_GROUP
 	disable:
 		- servicelb
 		- traefik
@@ -67,5 +64,5 @@ install_k3s(){
 
 get_k3s_kubeconfig(){
 	# Get kubeconfig with tailscale IP
-	cat $CHAOS_DIR/kubeconfig.yaml | sed  -e "s/127.0.0.1/$HOSTNAME.$CHAOS_DOMAIN/g"
+	sudo cat /etc/rancher/k3s/k3s.yaml | sed  -e "s/127.0.0.1/$HOSTNAME.$CHAOS_DOMAIN/g"
 }
