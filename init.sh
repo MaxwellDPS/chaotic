@@ -140,21 +140,21 @@ run() {
 	# setup_tailscale
 	# echo "[ENTER] STEP 4 - Tailscale"
 
-	# kube
-	source $CHAOS_DIR/chaotic/k3s.sh
-	install_k3s
-	sudo systemctl status k3s
-	echo "[ENTER] STEP 4 - k3s"
+	# # kube
+	# source $CHAOS_DIR/chaotic/k3s.sh
+	# install_k3s
+	# sudo systemctl status k3s
+	# echo "[ENTER] STEP 4 - k3s"
 
-	source $CHAOS_DIR/chaotic/gvisor.sh
-	install_gvisor
+	# source $CHAOS_DIR/chaotic/gvisor.sh
+	# install_gvisor
 
-	# Falco
-	source $CHAOS_DIR/chaotic/falco.sh
-	install_falco
+	# # Falco
+	# source $CHAOS_DIR/chaotic/falco.sh
+	# install_falco
 
-	sudo systemctl list-units | grep falco
-	echo "[ENTER] STEP 4 - falco"
+	# sudo systemctl list-units | grep falco
+	# echo "[ENTER] STEP 4 - falco"
 
 
 	# UFW
