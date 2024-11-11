@@ -20,7 +20,7 @@ config_ufw_defauts() {
 
 	### SYSLOG ###
 	# Add firewall rule for syslog
-	sudo ufw allow out to port "$SPLUNK_PORT" proto tcp comment "Splunk syslog"
+	sudo ufw allow out to any port "$SPLUNK_PORT" proto tcp comment "Splunk syslog"
 
     ### k3s ###
     sudo ufw allow 6443/tcp #apiserver
