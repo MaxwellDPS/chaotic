@@ -1,9 +1,6 @@
 #!/bin/bash
 
 config_ufw_defauts() {
-	# Setup cloudflare IPs
-	sudo $CHAOS_DIR/scripts/cf-ufw-rules.sh || true
-
 	### Upgrades (4 now) ###
 	# Allow outbound access for apt updates (HTTP and HTTPS)
 	sudo ufw allow out 80/tcp  comment "[out] HTTP"
@@ -39,6 +36,9 @@ enable_ufw() {
 
 	# Add Default policies
 	config_ufw_defauts
+
+    # Setup cloudflare IPs
+	sudo $CHAOS_DIR/scripts/cf-ufw-rules.sh || true
     
 	# Enable UFW
 	sudo ufw status | grep -qw "Status: active" || sudo ufw enable
