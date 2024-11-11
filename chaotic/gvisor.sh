@@ -19,12 +19,13 @@ install_gvisor(){
 	sudo systemctl restart k3s
 
 	# Install Runtime
-	cat <<-EOF | sudo kubectl apply -f -
-	apiVersion: node.k8s.io/v1
-	kind: RuntimeClass
-	metadata:
-		name: gvisor
-	handler: runsc
-	EOF
+	cat <<EOF | sudo tee /tmp/runtime
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: gvisor
+handler: runsc
+EOF
+	sudo kubectl apply -f /tmp/runtime
 
 }
