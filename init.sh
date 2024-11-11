@@ -161,8 +161,6 @@ run() {
 	source $CHAOS_DIR/chaotic/ufw.sh
 	enable_ufw
 
-	dmesg
-	echo "[ENTER] STEP 4 - ufw"
 
 	get_k3s_kubeconfig
 	sudo kubectl get no
