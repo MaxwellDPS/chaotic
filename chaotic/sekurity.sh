@@ -33,3 +33,9 @@ sysctl_settings(){
   sudo cp $CHAOS_DIR/etc/sysctl.d/*.conf /etc/sysctl.d/
 	sudo sysctl --system
 }
+
+sysctl_settings_lite(){
+	# harden sysctl settings
+  sudo cp $CHAOS_DIR/etc/sysctl.d/99-chaos-hardening.conf /etc/sysctl.d/
+	sudo sysctl --system
+}
