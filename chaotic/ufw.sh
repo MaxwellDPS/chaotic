@@ -26,39 +26,16 @@ config_ufw_defauts() {
 	sudo ufw allow out to "$SPLUNK_HOST" port "$SPLUNK_PORT" proto tcp comment "Splunk syslog"
 
     ### k3s ###
-    ufw allow 6443/tcp #apiserver
-    ufw allow from $POD_CIDR to any #pods
-    ufw allow from $SVC_CIDR to any #services
+    sudo ufw allow 6443/tcp #apiserver
+    sudo ufw allow from $POD_CIDR to any #pods
+    sudo ufw allow from $SVC_CIDR to any #services
 
-}
-
-setup_ufw_for_docker() {
-	# Enable UFW and set default policies
-	
-	# Set Docker rules for UFW
-	sudo curl -sSL $REPO_URL/etc/ufw/after.rules -o /etc/ufw/after.rules
-
-	# Configure Docker to stop manipulating iptables directly
-	daemon_json="$XDG_CONFIG_HOME/docker/daemon.json"
-	if [ ! -f "$daemon_json" ]; then
-		echo "{}" > "$daemon_json"
-	fi
-
-	# Update daemon.json to prevent Docker from overriding iptables
-	jq '. + {"iptables": false}' "$daemon_json" > tmp.json
-	sudo mv tmp.json "$daemon_json"
-
-	# Restart Docker and UFW to apply the changes
-	systemctl --user restart docker ufw
 }
 
 enable_ufw() {
 	# Set default UFW policies
 	sudo ufw default deny incoming
 	sudo ufw default allow outgoing
-
-	# Fix UFW + Docker
-	setup_ufw_for_docker
 
 	# Add Default policies
 	config_ufw_defauts
