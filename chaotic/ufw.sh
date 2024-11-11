@@ -34,6 +34,8 @@ enable_ufw() {
 	sudo ufw default deny incoming
 	sudo ufw default allow outgoing
 
+    sudo ufw allow ssh
+
 	# Add Default policies
 	config_ufw_defauts
 
@@ -41,7 +43,7 @@ enable_ufw() {
 	sudo $CHAOS_DIR/scripts/cf-ufw-rules.sh || true
     
 	# Enable UFW
-	sudo ufw status | grep -qw "Status: active" || sudo ufw enable
+	sudo ufw status | grep -qw "Status: active" || echo "y" | sudo ufw enable
 
 	# Reload UFW to ensure changes take effect
 	sudo ufw reload
