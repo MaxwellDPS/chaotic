@@ -36,7 +36,7 @@ setup_ufw_for_docker() {
 	# Enable UFW and set default policies
 	
 	# Set Docker rules for UFW
-	sudo curl -FsSL $REPO_URL/etc/ufw/after.rules > /etc/ufw/after.rules
+	sudo curl -sSL $REPO_URL/etc/ufw/after.rules -o /etc/ufw/after.rules
 
 	# Configure Docker to stop manipulating iptables directly
 	daemon_json="$XDG_CONFIG_HOME/docker/daemon.json"

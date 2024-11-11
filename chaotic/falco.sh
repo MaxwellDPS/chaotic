@@ -3,7 +3,7 @@
 install_falco(){
     # Download signing key
 	curl -fsSL https://falco.org/repo/falcosecurity-packages.asc | \
-	sudo gpg  --batch --yes  --dearmor -o /usr/share/keyrings/falco-archive-keyring.gpg
+	sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/falco-archive-keyring.gpg
 
     # Setup Falco in package manager
 	echo "deb [signed-by=/usr/share/keyrings/falco-archive-keyring.gpg] https://download.falco.org/packages/deb stable main" | \
