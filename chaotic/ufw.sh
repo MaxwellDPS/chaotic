@@ -2,7 +2,7 @@
 
 config_ufw_defauts() {
 	# Setup cloudflare IPs
-	cf-ip-update.sh
+	$CHAOS_DIR/scripts/cf-ip-update.sh
 
 	### Upgrades (4 now) ###
 	# Allow outbound access for apt updates (HTTP and HTTPS)
@@ -48,4 +48,6 @@ enable_ufw() {
 
 	# Reload UFW to ensure changes take effect
 	sudo ufw reload
+
+    sudo ufw status
 }
