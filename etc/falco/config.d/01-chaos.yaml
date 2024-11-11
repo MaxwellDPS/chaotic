@@ -1,4 +1,4 @@
-load_plugins: [k8saudit,json]
+load_plugins: []
 
 rule_matching: all
 log_stderr: true
@@ -6,7 +6,7 @@ log_syslog: true
 
 json_output: true
 json_include_output_property: true
-json_include_message_property: 
+json_include_message_property: true
 
 engine:
   kind: modern_ebpf
