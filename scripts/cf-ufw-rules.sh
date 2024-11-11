@@ -5,7 +5,7 @@ CLOUDFLARE_IP_RANGES=$(curl -s https://www.cloudflare.com/ips-v4; curl -s https:
 
 # Remove old Cloudflare IP rules
 echo "Removing old Cloudflare IP rules..."
-for rule in $(ufw status numbered | grep "ALLOW OUT" | grep -E "Cloudflare" | awk -F'[][]' '{print \$2}' | sort -nr); do
+for rule in $(ufw status numbered | grep "ALLOW OUT" | grep -E "Cloudflare" | awk -F'[][]' '{print $2}' | sort -nr); do
     ufw delete $rule
 done
 
