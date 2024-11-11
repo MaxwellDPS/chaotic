@@ -2,7 +2,7 @@
 
 config_ufw_defauts() {
 	# Setup cloudflare IPs
-	$CHAOS_DIR/scripts/cf-ip-update.sh
+	$CHAOS_DIR/scripts/cf-ufw-rules.sh
 
 	### Upgrades (4 now) ###
 	# Allow outbound access for apt updates (HTTP and HTTPS)

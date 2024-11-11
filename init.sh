@@ -100,7 +100,7 @@ init_chaos() {
 	# Setup Cron
 	sudo crontab -r || true
 	(	
-		echo "0 * * * * $CHAOS_DIR/scripts/cf-ip-update.sh | logger -t cf-ip-update";
+		echo "0 * * * * $CHAOS_DIR/scripts/cf-ufw-rules.sh | logger -t cf-ufw-rules";
 		echo "0 * * * * $CHAOS_DIR/scripts/chaos-x509.sh   | logger -t chaos-x509"
 	) | sudo crontab -
 
