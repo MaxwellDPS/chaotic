@@ -140,11 +140,11 @@ run() {
 	# setup_tailscale
 	# echo "[ENTER] STEP 4 - Tailscale"
 
-	# # kube
-	# source $CHAOS_DIR/chaotic/k3s.sh
-	# install_k3s
-	# sudo systemctl status k3s
-	# echo "[ENTER] STEP 4 - k3s"
+	# kube
+	source $CHAOS_DIR/chaotic/k3s.sh
+	install_k3s
+	sudo systemctl status k3s
+	echo "[ENTER] STEP 4 - k3s"
 
 	source $CHAOS_DIR/chaotic/gvisor.sh
 	install_gvisor
