@@ -14,11 +14,9 @@ install_falco(){
 
     # Show running drivers and stop all
 	sudo systemctl list-units | grep falco
-	sudo systemctl stop falco*
 
     # Set falco to modern eBPF
 	sudo falcoctl driver config --type modern_ebpf
-	sudo systemctl start falco-modern-bpf.service
 	sudo systemctl enable falco-modern-bpf.service
 
     # Enable the Falco rule updates
@@ -30,7 +28,7 @@ install_falco(){
 
 	# Falco configuration for rootless Docker
 	sudo cp $CHAOS_DIR/etc/falco/config.d/01-chaos.yaml     /etc/falco/config.d/01-chaos.yaml
-    sed -i -e "s/CHAOS_DIR/$CHAOS_DIR/g"                    /etc/falco/config.d/01-chaos.yaml
+    sudo sed -i -e "s;CHAOS_DIR;$CHAOS_DIR;g"               /etc/falco/config.d/01-chaos.yaml
     
 	# Restart Falco to apply the new configuration
 	sudo systemctl restart falco
