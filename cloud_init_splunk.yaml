@@ -49,8 +49,13 @@ runcmd:
   - systemctl start falco
   - systemctl unmask falcoctl-artifact-follow.service
   - systemctl enable falcoctl-artifact-follow.service
-  - echo "10.42.0.35:/splunk /opt/splunk/var/lib/splunk nfs defaults 0 0" | tee -a /etc/fstab
+  - mkdir -p /mnt/splunk
+  - echo "10.42.0.35:/splunk /mnt/splunk nfs defaults 0 0" | tee -a /etc/fstab
   - mount -a
+  - df -h
+  - ln -s /opt/splunk/var/lib/splunk /mnt/splunk
+  - chown -R splunk:splunk  /opt/splunk
+  - ls -lash /opt/splunk/var/lib/
   - bash /opt/install-splunk.sh
   - reboot
 user:
@@ -85,9 +90,9 @@ write_files:
     content: |
       [chaos]
 
-      homePath   = $SPLUNK_DB/chaos/db
-      coldPath   = $SPLUNK_DB/chaos/colddb
-      thawedPath = $SPLUNK_DB/chaos/thaweddb
+      homePath   = /mnt/splunk/chaos/db
+      coldPath   = /mnt/splunk/chaos/colddb
+      thawedPath = /mnt/splunk/chaos/thaweddb
       maxDataSize = 10000
       maxHotBuckets = 10
     path: /opt/splunk/etc/system/local/indexes.conf

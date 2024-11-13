@@ -22,8 +22,8 @@ TAILSCALE_SERVER=${TAILSCALE_SERVER:-"https://controlplane.tailscale.com"}
 
 
 # Directory containing files to be converted
-SCRIPTS_PATH="`pwd`/chaotic/scripts"
-x509_PATH="`pwd`/chaotic/x509"
+SCRIPTS_PATH="`pwd`/scripts"
+x509_PATH="`pwd`/x509"
 # Path to the YAML file to update
 YAML_FILE="cloud_init_splunk.yaml"
 
@@ -89,7 +89,7 @@ yq eval --inplace ".hostname  = \"$1\"" $YAML_FILE
 yq eval --inplace ".fqdn  = \"$1.$CHAOS_DOMAIN\"" $YAML_FILE
 
 FALCO_CONFIG=$(
-    cat `pwd`/chaotic/etc/falco/config.d/01-chaos.yaml |
+    cat `pwd`/etc/falco/config.d/01-chaos.yaml |
     sed -e "s;CHAOS_DIR;$CHAOS_DIR;g" |
     base64 | tr -d '\n' 
 )
@@ -115,7 +115,7 @@ fi
 
 
 SPLUNK=$(
-    cat `pwd`/chaotic/chaotic/install-splunk.sh |
+    cat `pwd`/chaotic/install-splunk.sh |
     sed -e "s;SPLUNK_HOST;$SPLUNK_HOST;g" |
     sed -e "s;SPLUNK_PASS;$SPLUNK_PASS;g" |
     base64 | tr -d '\n' 
