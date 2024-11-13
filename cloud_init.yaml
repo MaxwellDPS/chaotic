@@ -1,0 +1,173 @@
+#cloud-config
+hostname: fog
+ssh_pwauth: false
+create_hostname_file: true
+fqdn: fog.chaos.corp
+prefer_fqdn_over_hostname: false
+### Locale
+keyboard:
+  layout: us
+timezone: US/Pacific
+locale: en_US
+### SSH BASIK
+allow_public_ssh_keys: true
+disable_root: true
+disable_root_opts: no-port-forwarding,no-agent-forwarding,no-X11-forwarding
+disable_ec2_metadata: true
+### APT
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+packages:
+  - unattended-upgrades
+  - apt-transport-https
+  - ca-certificates
+  - ufw
+  - jq
+  - yq
+  - curl
+  - wget
+  - nano
+  - htop
+  - uuid
+  - net-tools
+  - dnsutils
+  - unzip
+  - gnupg
+  - tree
+  - cron
+  - qemu-guest-agent
+### USERS
+ssh_import_id: ['gh:maxwelldps']
+groups:
+  - chaos
+  - docker
+runcmd:
+  - FALCO_FRONTEND=noninteractive FALCO_DRIVER_CHOICE=modern_ebpf apt-get install -y falco
+  - falcoctl driver config --type modern_ebpf
+  - systemctl enable falco
+  - systemctl start falco
+  - systemctl unmask falcoctl-artifact-follow.service
+  - systemctl enable falcoctl-artifact-follow.service
+user:
+  name: professor_chaos
+  shell: /bin/bash
+  groups: chaos,docker
+  lock_passwd: true
+  sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+### SYSLOG
+rsyslog:
+  config_dir: /opt/etc/rsyslog.d
+  config_filename: 99-late-chaos-config.conf
+  service_reload_command: auto
+  configs:
+    - '*.* @@splunk.chaos.corp:6514'
+  install_rsyslog: true
+  packages: [rsyslogd]
+# Files
+write_files:
+  - encoding: text/plain
+    content: |
+      0 * * * * /opt/chaos/scripts/chaos-x509.sh   | logger -t chaos-x509
+    path: /etc/crontab
+    append: true
+  - encoding: base64
+    content: IyEvYmluL2Jhc2gKCmVjaG8gIkF0dGVtcHRpbmcgdG8gZmluZCBMVUtTIHBhcnRpdGlvbiBhdXRvbWF0aWNhbGx5Li4uIgpsdWtzX2RldmljZT0kKGxzYmxrIC1vIE5BTUUsVFlQRSxGU1RZUEUgLW5yIHwgYXdrICckMiA9PSAiY3J5cHQiIHtwcmludCAiL2Rldi8iICQxfScgfCBoZWFkIC1uIDEpCgppZiBbWyAteiAiJGx1a3NfZGV2aWNlIiBdXTsgdGhlbgogICAgZWNobyAiRXJyb3I6IE5vIExVS1MgcGFydGl0aW9uIGZvdW5kLiIKICAgIHJldHVybiAxCmZpCgplY2hvICJGb3VuZCBMVUtTIGRldmljZTogJGx1a3NfZGV2aWNlIgoKZWNobyAiQWRkaW5nIGEgbmV3IHBhc3N3b3JkIHRvIExVS1MgZGV2aWNlOiAkbHVrc19kZXZpY2UiCmNyeXB0c2V0dXAgbHVrc0FkZEtleSAiJGx1a3NfZGV2aWNlIgoKaWYgW1sgXCQ/IC1lcSAwIF1dOyB0aGVuCiAgICBlY2hvICJOZXcgTFVLUyBwYXNzd29yZCBhZGRlZCBzdWNjZXNzZnVsbHkuIgplbHNlCiAgICBlY2hvICJGYWlsZWQgdG8gYWRkIG5ldyBMVUtTIHBhc3N3b3JkLiIKICAgIHJldHVybiAxCmZpCg==
+    owner: root:chaos
+    path: /opt/chaos/scripts/add_luks_pw.sh
+    permissions: "0o654"
+  - encoding: base64
+    content: IyEvYmluL2Jhc2gKCmVjaG8gIkZldGNoaW5nIGxhdGVzdCBDbG91ZGZsYXJlIElQIHJhbmdlcy4uLiIKQ0xPVURGTEFSRV9JUF9SQU5HRVM9JChjdXJsIC1zIGh0dHBzOi8vd3d3LmNsb3VkZmxhcmUuY29tL2lwcy12NDsgY3VybCAtcyBodHRwczovL3d3dy5jbG91ZGZsYXJlLmNvbS9pcHMtdjYpCgojIFJlbW92ZSBvbGQgQ2xvdWRmbGFyZSBJUCBydWxlcwplY2hvICJSZW1vdmluZyBvbGQgQ2xvdWRmbGFyZSBJUCBydWxlcy4uLiIKZm9yIHJ1bGUgaW4gJCh1Zncgc3RhdHVzIG51bWJlcmVkIHwgZ3JlcCAiQUxMT1cgT1VUIiB8IGdyZXAgLUUgIkNsb3VkZmxhcmUiIHwgYXdrIC1GJ1tdW10nICd7cHJpbnQgJDJ9JyB8IHNvcnQgLW5yKTsgZG8KICAgIGVjaG8gInkiIHwgdWZ3IGRlbGV0ZSAkcnVsZQpkb25lCgojIEFkZCBuZXcgQ2xvdWRmbGFyZSBJUCBydWxlcwplY2hvICJBZGRpbmcgbmV3IENsb3VkZmxhcmUgSVAgcnVsZXMuLi4iCmZvciBpcF9yYW5nZSBpbiAkQ0xPVURGTEFSRV9JUF9SQU5HRVM7IGRvCiAgICB1ZncgYWxsb3cgb3V0IHRvICIkaXBfcmFuZ2UiIGNvbW1lbnQgIkNsb3VkZmxhcmUiCmRvbmU=
+    owner: root:chaos
+    path: /opt/chaos/scripts/cf-ufw-rules.sh
+    permissions: "0o654"
+  - encoding: base64
+    content: IyEvYmluL2Jhc2gKCiMjIyMjIERvd25sb2FkIENBIGNlcnRzIGZvciBDSEFPUyAjIyMjIyMjCgojIERpcmVjdG9yeSB0byBzdG9yZSBkb3dubG9hZGVkIGNlcnRpZmljYXRlcwpDRVJUX0RJUj0iL3Vzci9sb2NhbC9zaGFyZS9jYS1jZXJ0aWZpY2F0ZXMvY2hhb3MiCm1rZGlyIC1wICRDRVJUX0RJUgoKQ0VSVF9JTkZPX0ZJTEU9L29wdC9jaGFvcy94NTA5Ly5zcGVjdHIueWFtbAoKIyBDaGVja3MgZm9yIENBIG1ldGEgZmlsZQppZiBbWyAhIC1mICIkQ0VSVF9JTkZPX0ZJTEUiIF1dOyB0aGVuCiAgZWNobyAiWUFNTCBmaWxlIG5vdCBmb3VuZDogJENFUlRfSU5GT19GSUxFIgogIHJldHVybiAxCmZpCgojIEV4dHJhY3QgVVJMcyBmcm9tIHRoZSBZQU1MIGZpbGUgdXNpbmcgeXEKdXJscz0kKHlxIC1yICcuYWN0aXZlW10udXJsJyAiJENFUlRfSU5GT19GSUxFIikKCmZvciB1cmwgaW4gJHVybHM7IGRvCiAgZWNobyAiRG93bmxvYWRpbmcgQ0EgY2VydGlmaWNhdGUgZnJvbSAkdXJsIgogIGNlcnRfbmFtZT0kKGJhc2VuYW1lICIkdXJsIikKICBjZXJ0X3BhdGg9IiRDRVJUX0RJUi8kY2VydF9uYW1lIgoKICAjIERvd25sb2FkIHRoZSBjZXJ0aWZpY2F0ZQogIGlmIGN1cmwgLXNTTCAtbyAiJGNlcnRfcGF0aCIgJHVybDsgdGhlbgogICAgZWNobyAiU3VjY2Vzc2Z1bGx5IGRvd25sb2FkZWQgJGNlcnRfbmFtZSIKICBlbHNlCiAgICBlY2hvICJGYWlsZWQgdG8gZG93bmxvYWQgJHVybCIKICAgIGNvbnRpbnVlCiAgZmkKZG9uZQoKIyBVcGRhdGUgdGhlIENBIGNlcnRpZmljYXRlcwp1cGRhdGUtY2EtY2VydGlmaWNhdGVzCg==
+    owner: root:chaos
+    path: /opt/chaos/scripts/chaos-x509.sh
+    permissions: "0o654"
+  - encoding: base64
+    content: IyEvYmluL2Jhc2gKCiMgUmVhZCBpbnB1dCBmcm9tIHN0ZGluCmlucHV0PSQoY2F0KQpsb2dfanNvbj0kKGVjaG8gIiRpbnB1dCIgfCBqcSAtLWFyZyBob3N0bmFtZSAiYGhvc3RuYW1lYCIgJy4gfCB7aG9zdDogJGhvc3RuYW1lLCBzb3VyY2V0eXBlOiAiZmFsY28iLCBpbmRleDogImZhbGNvIiwgZXZlbnQ6IC59JykKCmN1cmwgLWsgLWQgIiRsb2dfanNvbiIgXAogICAgLUggIkF1dGhvcml6YXRpb246IFNwbHVuayBQT1RBVE8iIFwKICAgICJodHRwczovL3NwbHVuay5jaGFvcy5jb3JwOjgwODgvc2VydmljZXMvY29sbGVjdG9yL2V2ZW50Ig==
+    owner: root:chaos
+    path: /opt/chaos/scripts/log_hec.sh
+    permissions: "0o654"
+  - encoding: base64
+    content: "bG9hZF9wbHVnaW5zOiBbXQoKcnVsZV9tYXRjaGluZzogYWxsCmxvZ19zdGRlcnI6IHRydWUKbG9nX3N5c2xvZzogdHJ1ZQoKanNvbl9vdXRwdXQ6IHRydWUKanNvbl9pbmNsdWRlX291dHB1dF9wcm9wZXJ0eTogdHJ1ZQpqc29uX2luY2x1ZGVfbWVzc2FnZV9wcm9wZXJ0eTogdHJ1ZQoKZW5naW5lOgogIGtpbmQ6IG1vZGVybl9lYnBmCgpzdGRvdXRfb3V0cHV0OgogIGVuYWJsZWQ6IHRydWUKCnN5c2xvZ19vdXRwdXQ6CiAgZW5hYmxlZDogdHJ1ZQoKZmlsZV9vdXRwdXQ6CiAgZW5hYmxlZDogZmFsc2UKICBrZWVwX2FsaXZlOiBmYWxzZQogIGZpbGVuYW1lOiAvdmFyL2xvZy9mYWxjby9mYWxjby5sb2cKCnByb2dyYW1fb3V0cHV0OgogIGVuYWJsZWQ6IHRydWUKICBwcm9ncmFtOiAgL29wdC9jaGFvcy9zY3JpcHRzL2xvZ19oZWMuc2g="
+    owner: root:chaos
+    path: /etc/falco/config.d/01-chaos.yaml
+    permissions: "0o654"
+apt:
+  sources:
+    falco:
+      filename: falcosecurity.list
+      source: deb [signed-by=$KEY_FILE] https://download.falco.org/packages/deb stable main
+      keyid: 2005399002d5e8ff59f28ce64021833e14cb7a8d
+      keyserver: keyserver.ubuntu.com
+    source2:
+      filename: gvisor.list
+      source: deb [arch=amd64 signed-by=$KEY_FILE] https://storage.googleapis.com/gvisor/releases release main
+      keyid: 6f1df85e3a71c24918e727d56fc6d554e32bd943
+      keyserver: keyserver.ubuntu.com
+#cloud-config
+ca_certs:
+  remove_defaults: false
+  trusted:
+    - |-
+      -----BEGIN CERTIFICATE-----
+      MIIDLTCCArOgAwIBAgIIJEOUNshbVgIwCgYIKoZIzj0EAwMwgYQxCzAJBgNVBAYT
+      AktaMQ0wCwYDVQQIEwRXRVNUMSAwHgYDVQQHExdEci4gRXZpbHMgVm9sY2FubyBM
+      YXllcjETMBEGA1UEChMKQ0hBT1MuQ09SUDEYMBYGA1UECxMPQ0hBT1RJQyBGQUNU
+      T1JTMRUwEwYDVQQDEwxjaGFvcy5jb20uY28wHhcNMjQwNDIwMTIxNTAwWhcNMzUw
+      NjA5MTIxNTAwWjCBhDELMAkGA1UEBhMCS1oxDTALBgNVBAgTBFdFU1QxIDAeBgNV
+      BAcTF0RyLiBFdmlscyBWb2xjYW5vIExheWVyMRMwEQYDVQQKEwpDSEFPUy5DT1JQ
+      MRgwFgYDVQQLEw9DSEFPVElDIEZBQ1RPUlMxFTATBgNVBAMTDGNoYW9zLmNvbS5j
+      bzB2MBAGByqGSM49AgEGBSuBBAAiA2IABIt5UvVcp9mTmq7b9u54z75JltyfDe8q
+      1g5OPlhzfUaNJtupGtaDI9u7aA9Eyfkkjns7V8CZBJVxuUoqdgRkZKdkL+sY3Cws
+      bRqWGCBHtgJPyDNEUx+2/lnz+Rw1h60a9aOB7zCB7DAPBgNVHRMBAf8EBTADAQH/
+      MB0GA1UdDgQWBBRxbxzzRp0uPniagqn3sjwojdMaZzALBgNVHQ8EBAMCAQYwFwYD
+      VR0RBBAwDoIMY2hhb3MuY29tLmNvMIGTBgNVHR8EgYswgYgwLKAqoCiGJmh0dHBz
+      Oi8vY2FuYXJ5LmNoYW9zLmNvbS5jby9yaXAtYS1yb25pMCmgJ6AlhiNodHRwczov
+      L3JpcC5jaGFvcy5jb20uY28vcmlwLWEtcm9uaTAtoCugKYYnaHR0cHM6Ly95ZWV0
+      Lmt1YmVkZXN0cnllci5pby9yaXAtYS1yb25pMAoGCCqGSM49BAMDA2gAMGUCMQDM
+      lyT2f3+LYEIdAT2ElDh7rLMfEMKbayvxZmPRYIuPdYJ4RMlKwtWWkF0vgnUErakC
+      MACZqm/38iakwO0iY+rSu35ibgIdBP6MyX+dJt1aU0EIPfeBAdEFUG6Z8de+wwf0
+      7g==
+      -----END CERTIFICATE-----
+    - |-
+      -----BEGIN CERTIFICATE-----
+      MIIDLTCCArOgAwIBAgIIJdYRA8JQQaswCgYIKoZIzj0EAwIwgYQxCzAJBgNVBAYT
+      AktaMQ0wCwYDVQQIEwRXRVNUMSAwHgYDVQQHExdEci4gRXZpbHMgVm9sY2FubyBM
+      YXllcjETMBEGA1UEChMKQ0hBT1MuQ09SUDEYMBYGA1UECxMPQ0hBT1RJQyBGQUNU
+      T1JTMRUwEwYDVQQDEwxjaGFvcy5jb20uY28wHhcNMjQwNDIwMTIxNTAwWhcNMzUw
+      NjA5MTIxNTAwWjCBhDELMAkGA1UEBhMCS1oxDTALBgNVBAgTBFdFU1QxIDAeBgNV
+      BAcTF0RyLiBFdmlscyBWb2xjYW5vIExheWVyMRMwEQYDVQQKEwpDSEFPUy5DT1JQ
+      MRgwFgYDVQQLEw9DSEFPVElDIEZBQ1RPUlMxFTATBgNVBAMTDGNoYW9zLmNvbS5j
+      bzB2MBAGByqGSM49AgEGBSuBBAAiA2IABFsGNcgxRCaT2SOfH1ioJTmXdi5QZd9M
+      UXmopgC7Ifs6ZXQ6ygJsWoKul21UkulGYn6ooFnTNgez48FWCWGTgsyEPDm3ork2
+      ANZRVie6ro4tsvhZj4MKTrdLS5y2wq4EOaOB7zCB7DAPBgNVHRMBAf8EBTADAQH/
+      MB0GA1UdDgQWBBRzFvwll2NJgzF7dMWTFighOCaHQDALBgNVHQ8EBAMCAQYwFwYD
+      VR0RBBAwDoIMY2hhb3MuY29tLmNvMIGTBgNVHR8EgYswgYgwLKAqoCiGJmh0dHBz
+      Oi8vY2FuYXJ5LmNoYW9zLmNvbS5jby9yaXAtYS1yb25pMCmgJ6AlhiNodHRwczov
+      L3JpcC5jaGFvcy5jb20uY28vcmlwLWEtcm9uaTAtoCugKYYnaHR0cHM6Ly95ZWV0
+      Lmt1YmVkZXN0cnllci5pby9yaXAtYS1yb25pMAoGCCqGSM49BAMCA2gAMGUCMGwh
+      fMlrLvTUkKqXYd9Adifmng+3/E+3HG0Mz19rZOT2e1XrGyVSif+3JUVCguSALgIx
+      AMeecZp0/nMkgICXL9UVX7IQmBVFcIy+ZwBGOpd/FxSZN5s0g/9EuLux3OJlfnO1
+      nA==
+      -----END CERTIFICATE-----
+    - |-
+      -----BEGIN CERTIFICATE-----
+      MIICfDCCAgKgAwIBAgIISGoqJAO0KR0wCgYIKoZIzj0EAwMwgYQxCzAJBgNVBAYT
+      AktaMQ0wCwYDVQQIEwRXRVNUMSAwHgYDVQQHExdEci4gRXZpbHMgVm9sY2FubyBM
+      YXllcjETMBEGA1UEChMKQ0hBT1MuQ09SUDEYMBYGA1UECxMPQ0hBT1RJQyBGQUNU
+      T1JTMRUwEwYDVQQDEwxjaGFvcy5jb20uY28wHhcNMjQwODExMTIyMjAwWhcNMzQw
+      ODExMTIyMjAwWjCBhDELMAkGA1UEBhMCS1oxDTALBgNVBAgTBFdFU1QxIDAeBgNV
+      BAcTF0RyLiBFdmlscyBWb2xjYW5vIExheWVyMRMwEQYDVQQKEwpDSEFPUy5DT1JQ
+      MRgwFgYDVQQLEw9DSEFPVElDIEZBQ1RPUlMxFTATBgNVBAMTDGNoYW9zLmNvbS5j
+      bzB2MBAGByqGSM49AgEGBSuBBAAiA2IABOQeteKy7L9B38ENirwIuUxwOoh4ndPW
+      ykpC9+at1JldzePyXngcn/ppc1NeXsmfFb78El4FBR8LZlYwGDHR0hlETLVJewjz
+      ItuFKr7WJq7ffHWQPDWfXBr6rkKlK84TPKM/MD0wDwYDVR0TAQH/BAUwAwEB/zAd
+      BgNVHQ4EFgQUYoo+wWwTCwJ10G1jqh+4qknewjowCwYDVR0PBAQDAgEGMAoGCCqG
+      SM49BAMDA2gAMGUCMQCoojR6x5olK1K+ozXzlP7JY4ldvwhh4DfEYQZFwQX2Oa8L
+      XccuwlG3Am17MlsRQzsCMFxWji/QXhdp8zcfOztygP70eLO8a4DTzRQyINF4lkBo
+      RWNj4CdfFKklI4uZp1yU0A==
+      -----END CERTIFICATE-----
